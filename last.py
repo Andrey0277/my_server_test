@@ -1,7 +1,7 @@
 import socket
 from _io import open
 import os
-
+import threading
 def get_size(file_name):
     st= os.stat(file_name)
     return st.st_size
@@ -27,16 +27,16 @@ def get_ansver(par,file_name):
          return "HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: audio/mpeg\r\nConnection: close\r\nContent-Length:" +str(siz)   +"\r\n\r\n"
     elif par=="MOV":
          return "HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: video/quicktime \r\nConnection: close\r\nContent-Length:" +str(siz)+"\r\n\r\n"
- 
+	
  
 def write_kili_byte(f,siz,soket):
     print(siz)
-	
-    for i in range(siz//100000):
-        soket.sendall(f.read(100000))
+    r=1000
+    for i in range(siz//r):
+        soket.sendall(f.read(r))
 
-    if (siz%100000!=0):
-        soket.sendall(f.read(100000))
+    if (siz%r!=0):
+        soket.sendall(f.read(r))
     
         
 
@@ -75,15 +75,9 @@ def get_404(soc):
     soc.sendall(bytes("<h1>error:404<h1>",'utf-8')) 
       
 
-    
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(("0.0.0.0", 80))
-s.listen(1)
 
-while True:
-    soc,conect= s.accept()
-    
-   
+
+def potoc(soc):
     try:
         get_content(soc)
     except:
@@ -91,3 +85,15 @@ while True:
     soc.close()
 
 
+
+    
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(("0.0.0.0", 80))
+s.listen(1)
+
+while True:
+    soc,conect= s.accept()
+    t=threading.Thread(target=potoc,args=(soc,))
+    t.start()
+    
+    
