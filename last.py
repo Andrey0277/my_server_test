@@ -21,17 +21,30 @@ def get_ansver(par,file_name):
     elif par=="jpeg"or "jpg"==par:
       
         return"HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: image/jpeg\r\nConnection: close\r\nContent-Length:" +str(siz)   +"\r\n\r\n"
+       
+    elif par=="ico":
+        return"HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: image/vnd.microsoft.icon\r\nConnection: close\r\nContent-Length:" +str(siz)   +"\r\n\r\n"
+       
+       
+        
+    elif par=="png":  
+        return"HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: image/png\r\nConnection: close\r\nContent-Length:" +str(siz)   +"\r\n\r\n"    
+        
     elif par=="gif":
+    
          return "HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: image/gif\r\nConnection: close\r\nContent-Length:" +str(siz)   +"\r\n\r\n"
     elif par=="mp3":
          return "HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: audio/mpeg\r\nConnection: close\r\nContent-Length:" +str(siz)   +"\r\n\r\n"
     elif par=="MOV":
-         return "HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: video/quicktime \r\nConnection: close\r\nContent-Length:" +str(siz)+"\r\n\r\n"
-	
- 
+         return "HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: video/quicktime\r\nConnection: close\r\nContent-Length:" +str(siz)+"\r\n\r\n"
+    elif par=="mp4":
+         return "HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: video/mp4\r\nConnection: close\r\nContent-Length:" +str(siz)+"\r\n\r\n"
+   
+    return ""
+   
 def write_kili_byte(f,siz,soket):
     print(siz)
-    r=1000
+    r=1024
     for i in range(siz//r):
         soket.sendall(f.read(r))
 
@@ -70,7 +83,8 @@ def  get_content(soc):
     
     
 def get_404(soc):
-    rec="""HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: text/html\r\ncharset=utf-8\r\nConnection: close\r\n\r\n"""                 
+    rec="""HTTP/1.1 200 OK\r\nServer: Apache\r\nContent-Type: text/html\r\ncharset=utf-8\r\nConnection: close\r\n\r\n""" 
+    
     soc.sendall(bytes(rec,'utf-8'))
     soc.sendall(bytes("<h1>error:404<h1>",'utf-8')) 
       
@@ -79,21 +93,22 @@ def get_404(soc):
 
 def potoc(soc):
     try:
-        get_content(soc)
+        try:
+            get_content(soc)
+        except:
+            get_404(soc)
+        soc.close()
     except:
-        get_404(soc)
-    soc.close()
-
+        print("клієнт рзірвав зв'язок")
 
 
     
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(("0.0.0.0", 80))
+s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+s.bind(("::1", 80))
 s.listen(1)
 
 while True:
     soc,conect= s.accept()
     t=threading.Thread(target=potoc,args=(soc,))
     t.start()
-    
-    
+
