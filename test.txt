@@ -1,0 +1,3 @@
+git init = init
+git add .
+l;l;l; 
