@@ -6,7 +6,7 @@ def get_size(file_name):
     st= os.stat(file_name)
     return st.st_size
 
-# chenge 
+# chenge sds
 
 
 def get_ansver(par,file_name):
